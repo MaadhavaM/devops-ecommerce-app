@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevOps E-Commerce App</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  .card { background: white; border-radius: 12px; padding: 40px; width: 600px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+  .subtitle { color: #2563eb; font-size: 13px; margin-bottom: 8px; }
+  h1 { font-size: 28px; margin-bottom: 4px; }
+  .desc { color: #666; font-size: 14px; margin-bottom: 24px; }
+  .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  input { flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+  button { padding: 12px 24px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
+  button:hover { background: #1d4ed8; }
+  .status { color: #16a34a; font-size: 13px; margin-bottom: 16px; }
+  .product-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .product-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .product-name { font-weight: 500; }
+  .product-price { color: #2563eb; font-weight: 600; }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { padding: 4px 12px; border-radius: 20px; font-size: 12px; border: 1px solid; }
+  .tag-blue { color: #0891b2; border-color: #0891b2; }
+  .tag-green { color: #16a34a; border-color: #16a34a; }
+  .tag-orange { color: #ea580c; border-color: #ea580c; }
+  .tag-purple { color: #7c3aed; border-color: #7c3aed; }
+  .tag-red { color: #dc2626; border-color: #dc2626; }
+  .tag-gray { color: #4b5563; border-color: #4b5563; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="subtitle">INT332 - DevOps Virtualization and Configuration Management</div>
+  <h1>E-Commerce Microservices App</h1>
+  <p class="desc">Docker Compose: Frontend + Backend + Database</p>
+
+  <div class="input-row">
+    <input type="text" id="nameInput" placeholder="Product name..." />
+    <input type="number" id="priceInput" placeholder="Price..." />
+    <button onclick="addProduct()">Add</button>
+  </div>
+
+  <div class="status" id="status">⟳ Connecting to backend...</div>
+
+  <div class="product-list" id="productList"></div>
+
+  <div class="tags">
+    <span class="tag tag-blue">Nginx</span>
+    <span class="tag tag-green">Spring Boot</span>
+    <span class="tag tag-orange">MySQL</span>
+    <span class="tag tag-purple">Docker</span>
+    <span class="tag tag-red">Kubernetes</span>
+    <span class="tag tag-gray">GitHub Actions</span>
+    <span class="tag tag-blue">Jenkins</span>
+    <span class="tag tag-green">Maven</span>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:8080';
+
+  async function loadProducts() {
+    try {
+      const res = await fetch(API + '/api/products');
+      const data = await res.json();
+      document.getElementById('status').textContent = '✅ All services connected and running';
+      const list = document.getElementById('productList');
+      list.innerHTML = '';
+      data.forEach(p => {
+        list.innerHTML += `
+          <div class="product-item">
+            <span class="product-name">${p.name}</span>
+            <span class="product-price">$${p.price}</span>
+          </div>`;
+      });
+    } catch(e) {
+      document.getElementById('status').textContent = '⚠️ Backend connecting... (run docker-compose up)';
+      // Show demo data if backend not available
+      const demo = [{name:'Laptop',price:999.99},{name:'Phone',price:499.99},{name:'Tablet',price:299.99}];
+      const list = document.getElementById('productList');
+      list.innerHTML = '';
+      demo.forEach(p => {
+        list.innerHTML += `
+          <div class="product-item">
+            <span class="product-name">${p.name}</span>
+            <span class="product-price">$${p.price}</span>
+          </div>`;
+      });
+    }
+  }
+
+  function addProduct() {
+    const name = document.getElementById('nameInput').value;
+    const price = document.getElementById('priceInput').value;
+    if (!name || !price) return;
+    const list = document.getElementById('productList');
+    list.innerHTML += `
+      <div class="product-item">
+        <span class="product-name">${name}</span>
+        <span class="product-price">$${parseFloat(price).toFixed(2)}</span>
+      </div>`;
+    document.getElementById('nameInput').value = '';
+    document.getElementById('priceInput').value = '';
+  }
+
+  loadProducts();
+</script>
+</body>
+</html>
